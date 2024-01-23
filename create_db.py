@@ -1,13 +1,13 @@
 # 首先导入所需第三方库
 from langchain.document_loaders import UnstructuredFileLoader
 from langchain.document_loaders import UnstructuredMarkdownLoader
-from langchain.document_loaders import PyPDFLoader # for loading the pdf
-from langchain.chains import ChatVectorDBChain # for chatting with the pdf
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from tqdm import tqdm
 import os
+from langchain.document_loaders import PyPDFLoader
+from langchain.chains import ChatVectorDBChain
 
 # 获取文件路径函数
 def get_files(dir_path):
@@ -50,7 +50,7 @@ def get_text(dir_path):
 
 # 目标文件夹
 tar_dir = [
-    "/root/data/paper_demo/graph",
+    "/root/data_gnss/gnss_paper",
 ]
 
 # 加载目标文件
@@ -61,10 +61,10 @@ for dir_path in tar_dir:
 # 对文本进行分块
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=500, chunk_overlap=150)
-split_docs = text_splitter.split_documents(docs[:10])
+split_docs = text_splitter.split_documents(docs)
 
 # 加载开源词向量模型
-embeddings = HuggingFaceEmbeddings(model_name="/root/data/model/sentence-transformer")
+embeddings = HuggingFaceEmbeddings(model_name="/root/model/sentence-transformer")
 
 # 构建向量数据库
 # 定义持久化路径

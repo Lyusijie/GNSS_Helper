@@ -1,9 +1,12 @@
 from langchain.vectorstores import Chroma
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 import os
+from LLM import InternLM_LLM
+from langchain.prompts import PromptTemplate
+from langchain.chains import RetrievalQA
 
 # 定义 Embeddings
-embeddings = HuggingFaceEmbeddings(model_name="/root/data/model/sentence-transformer")
+embeddings = HuggingFaceEmbeddings(model_name="/root/model/sentence-transformer")
 
 # 向量数据库持久化路径
 persist_directory = 'data_base/vector_db/chroma'
@@ -13,10 +16,9 @@ vectordb = Chroma(
     persist_directory=persist_directory, 
     embedding_function=embeddings
 )
-from LLM import InternLM_LLM
-llm = InternLM_LLM(model_path = "/root/data/model/Shanghai_AI_Laboratory/internlm-chat-7b")
-# llm.predict("你是谁")
-from langchain.prompts import PromptTemplate
+
+llm = InternLM_LLM(model_path = "/root/model/Shanghai_AI_Laboratory/internlm-chat-7b")
+llm.predict("你是谁")
 
 # 我们所构造的 Prompt 模板
 template = """使用以下上下文来回答用户的问题。如果你不知道答案，就说你不知道。总是使用中文回答。
@@ -30,11 +32,10 @@ template = """使用以下上下文来回答用户的问题。如果你不知道
 
 # 调用 LangChain 的方法来实例化一个 Template 对象，该对象包含了 context 和 question 两个变量，在实际调用时，这两个变量会被检索到的文档片段和用户提问填充
 QA_CHAIN_PROMPT = PromptTemplate(input_variables=["context","question"],template=template)
-from langchain.chains import RetrievalQA
 
 qa_chain = RetrievalQA.from_chain_type(llm,retriever=vectordb.as_retriever(),return_source_documents=True,chain_type_kwargs={"prompt":QA_CHAIN_PROMPT})
 # 检索问答链回答效果
-question = "什么是Dynamic Graph"
+question = "什么是PPP-RTK"
 result = qa_chain({"query": question})
 print("检索问答链回答 question 的结果：")
 print(result["result"])
